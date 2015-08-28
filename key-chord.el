@@ -194,18 +194,7 @@
 ;; 0.1 (2003-04-27) david(at)symsoft.se
 ;;	First release
 
-
-;; 2015 Gregory Nisbet added map for custom delay for uncommon keys
-;; TODO: key triplets / generally achieve feature parity with vim-arpeggio
-;; TODO: move key-seq functionality into this module (or at least preserve the API that module depends on)
-;; TODO: symbols that are logically private to the package should be of the form key-chord--whatever
-;; TODO: add option to replace kmacro heuristics with an actual thing that inspects the macro being defined
-;;   and replaces the command if the key-chord is invoked during the definition.
-;;   actually, you totally might not be able to inject arbitrary commands and expressions and shit into a kmacro
-;;   we shall see
-
 ;;; Code:
-
 
 (defvar key-chord-two-keys-delay 0.1	; 0.05 or 0.1
   "Max time delay between two key press to be considered a key chord.")
@@ -213,45 +202,6 @@
 (defvar key-chord-one-key-delay 0.2	; 0.2 or 0.3 to avoid first autorepeat
   "Max time delay between two press of the same key to be considered a key chord.
 This should normally be a little longer than `key-chord-two-keys-delay'.")
-
-(defvar key-chord-delay-map (make-hash-table :test 'eq)
-  "custom delays for key chords involving common keys")
-
-(defun key-chord-put-delay (key value)
-  "put a delay in the key chord map"
-  (cl-assert (stringp key))
-  (cl-assert (eq (length key) 2))
-  
-  (puthash key value key-chord-delay-map)
-  )
-  
-(defun key-chord-get-delay (key)
-  "get a delay from the key chord map"
-  (cl-assert (stringp key))
-  (cl-assert (eq (length key)) 2)
-  
-  (gethash key key-chord-delay-map)
-  )
-  
-(defun key-chord-one-key-delay (key)
-	"look up delay associated with particular key or fall back to default"
-	(cl-assert (stringp key))
-  (let 
-  	((realkey (if (eq (length key) 1) (concat key key) key)))
-  	;; get delay from custom map, fall back to default
-  	(or (key-chord-get-delay realkey) key-chord-one-key-delay)
-  	))
-  	
-(defun key-chord-two-keys-delays (key)
-  "look up delay associated with two keys or fall back to default"
-  (cl-assert (stringp key))
-  (cl-assert (eq (length key) 2))
-  
-  ;; get delay from custom map, fall back to default
-  (or (key-chord-get-delay key) key-chord-two-key-delay)
-  )
-  	
-  	
 
 (defvar key-chord-in-macros t
   "If nil, don't expand key chords when executing keyboard macros.
